@@ -1,4 +1,5 @@
 # SafeSCARF API Connector
+
 ## Functionality
 
 The SafeSCARF API Connector provides the following functionality:
@@ -65,7 +66,8 @@ python safescarf-connector.py test-types
 
 ### Help
 
-To get help and see all available commands and options, use the following command:
+To get help and see all available commands and options, use the following
+command:
 
 ```bash
 python safescarf-connector.py help
@@ -73,7 +75,8 @@ python safescarf-connector.py help
 
 ## Example
 
-Here's an example of how you can create an engagement and upload scan results using the script:
+Here's an example of how you can create an engagement and upload scan results
+using the script:
 
 ```bash
 # Create an engagement for a branch workflow

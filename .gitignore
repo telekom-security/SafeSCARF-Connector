@@ -1,1 +1,4 @@
+# ignore local pipeline artifacts
+.gitlab-ci-local
+# ignore local python venv
 venv

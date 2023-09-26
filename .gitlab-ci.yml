@@ -1,0 +1,26 @@
+stages:
+  - lint
+  - build
+  - test
+  - publish
+
+variables:
+  DOCKER_REGISTRY: registry.gitlab.com  # Set your Docker registry URL here
+  DOCKER_IMAGE_NAME: your-docker-image-name  # Set your Docker image name here
+  README_FILE: README.md
+
+build_image:
+  stage: build
+  image: docker:stable
+  script:
+    - docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME .
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $DOCKER_REGISTRY
+    - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME
+
+lint_readme:
+  stage: lint
+  image: alpine:latest
+  script:
+    - apk --no-cache add nodejs npm
+    - npm install -g markdownlint-cli
+    - markdownlint -c .linter-config/markdownlint-cli-config.yml $README_FILE
