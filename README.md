@@ -1,92 +1,108 @@
-# SafeSCARF Shell connector
+# SafeSCARF API Connector
+## Functionality
 
+The SafeSCARF API Connector provides the following functionality:
 
+1. **Create Engagements**: You can use this script to create engagements in
+   SafeSCARF, making it easy to track and manage your security assessments for
+   different CI/CD workflows.
 
-## Getting started
+1. **Upload Scan Results**: The script enables you to upload scan results (e.g.,
+   security scans, vulnerability reports) to SafeSCARF, associating them with
+   the relevant engagements.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+1. **List Available Test Types**: You can fetch a list of available test types
+   from the SafeSCARF API, which can be useful when specifying the scan type for
+   your uploads.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Parameters
 
-## Add your files
+Here are the parameters you can use when running the script:
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.devops.telekom.de/secureops/safescarf/safescarf-shell-connector.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.devops.telekom.de/secureops/safescarf/safescarf-shell-connector/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+| Parameter                | Description                                                                                                 | Mandatory |
+|--------------------------|-------------------------------------------------------------------------------------------------------------|-----------|
+| `command`                | Specifies the command to execute. Available options: `create-engagement`, `upload`, `help`, `test-types`.   | Yes       |
+| `--workflow`             | Specifies the workflow type for creating engagements. Available options: `branch`, `pipeline`.              | No        |
+| `--api-key`              | Specifies the SafeSCARF API key as a string.                                                                | No        |
+| `--api-url`              | Specifies the custom SafeSCARF API URL as a string.                                                         | No        |
+| `--engagement-id`        | Specifies the engagement ID as an integer.                                                                  | No        |
+| `--environment`          | Specifies the scan environment.                                                                             | No        |
+| `--product-id`           | Specifies the product ID as a string.                                                                       | No        |
+| `--test-type`            | Specifies the scan type as a string.                                                                        | No        |
+| `files`                  | Files to upload. (only for upload command)                                                                  | No        |
 
 ## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+### Create Engagement
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+To create an engagement, use the following command:
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```bash
+python safescarf-connector.py create-engagement --workflow [workflow_type]
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Replace `[workflow_type]` with either `branch` or `pipeline` depending on your
+CI/CD workflow.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+### Upload Scan Results
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+To upload scan results, use the following command:
 
-## License
-For open source projects, say how it is licensed.
+```bash
+python safescarf-connector.py upload [file_paths]
+```
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Replace `[file_paths]` with the paths to the files you want to upload. Asterisk
+like `file*.json` is allowed.
+
+### List Available Test Types
+
+To list available test types, use the following command:
+
+```bash
+python safescarf-connector.py test-types
+```
+
+### Help
+
+To get help and see all available commands and options, use the following command:
+
+```bash
+python safescarf-connector.py help
+```
+
+## Example
+
+Here's an example of how you can create an engagement and upload scan results using the script:
+
+```bash
+# Create an engagement for a branch workflow
+python safescarf-connector.py create-engagement --workflow branch
+
+# Upload scan results for a specific environment. Engagement ID from previous
+# command is stored in an environmental variable.
+python safescarf-connector.py upload /path/to/scan-results.json --environment staging
+```
+
+## Requirements
+
+This script requires Python 3.x and the following Python packages:
+
+* argparse
+* os
+* json
+* requests
+* glob
+* datetime
+
+Please make sure you have these packages installed or install them using pip
+before running the script. A `requirements.txt` is provided.
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+## Note
+
+Before using the script, ensure you have the SafeSCARF API key and URL available
+for authentication and API access.
