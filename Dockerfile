@@ -30,9 +30,8 @@ ENV SAFESCARF_ENGAGEMENT_PERIOD=7 \
     SAFESCARF_WORKFLOW=""
 
 # Install any dependencies your script needs
-# For example, if you require additional Python packages, add them here.
 COPY requirements.txt /app/requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install -r /app/requirements.txt
 
 # Copy your Python script into the container
 COPY safescarf-connector.py /app/safescarf-connector.py

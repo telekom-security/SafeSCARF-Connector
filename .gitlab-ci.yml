@@ -5,17 +5,11 @@ stages:
   - publish
 
 variables:
-  DOCKER_REGISTRY: registry.gitlab.com  # Set your Docker registry URL here
-  DOCKER_IMAGE_NAME: your-docker-image-name  # Set your Docker image name here
+  MTR_REGISTRY: mtr.devops.telekom.de
+  MTR_REGISTRY_IMAGE: mtr.devops.telekom.de/secureops/safescarf-connector
   README_FILE: README.md
+  SAFESCARF_HOST: https://dt-sec.safescarf.pan-net.cloud/
 
-build_image:
-  stage: build
-  image: docker:stable
-  script:
-    - docker build -t $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME .
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $DOCKER_REGISTRY
-    - docker push $DOCKER_REGISTRY/$DOCKER_IMAGE_NAME
 
 lint_readme:
   stage: lint
@@ -24,3 +18,52 @@ lint_readme:
     - apk --no-cache add nodejs npm
     - npm install -g markdownlint-cli
     - markdownlint -c .linter-config/markdownlint-cli-config.yml $README_FILE
+
+build_image:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${MTR_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${MTR_REGISTRY_USER}" "${MTR_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+        --context "${CI_PROJECT_DIR}"
+        --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+        --destination "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_SHORT_SHA"
+        --build-arg http_proxy="http://proxy.devops.telekom.de:3128"
+        --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
+        --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
+
+scan-docker-image-trivy:
+  stage: test
+  image:
+    name: registry.safescarf.pan-net.cloud/trivy
+    entrypoint: [""]
+  variables:
+    SAFESCARF_ENG_ID: $SAFESCARF_ENG_ID
+    IMAGE: "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_SHORT_SHA"
+  script: |-
+          ci-connector --version
+          time trivy image --format json \
+            --output "$CI_PROJECT_DIR/trivy-container-scanning-report.json" "$IMAGE"
+          ci-connector upload-scan --scanner 'Trivy Scan' -e $SAFESCARF_ENG_ID -f "$CI_PROJECT_DIR/trivy-container-scanning-report.json"
+
+publish_release:
+  stage: publish
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  rules:
+    # Runs only when a tag with 'X.Y.Z' pattern is created
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${MTR_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${MTR_REGISTRY_USER}" "${MTR_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+        --context "${CI_PROJECT_DIR}"
+        --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+        --destination "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_TAG"
+        --build-arg http_proxy="http://proxy.devops.telekom.de:3128"
+        --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
+        --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
