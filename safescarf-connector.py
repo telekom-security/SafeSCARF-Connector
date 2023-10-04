@@ -38,15 +38,16 @@ SAFESCARF_SCAN_ENVIRONMENT = os.environ.get("SAFESCARF_SCAN_ENVIRONMENT", "Defau
 SAFESCARF_API_TOKEN = ""
 SAFESCARF_URL = ""
 SAFESCARF_ENGAGEMENT_ID = ""
+SAFESCARF_PRODUCTID = ""
 SAFESCARF_WORKFLOW = ""
 
-def get_available_test_types(api_url, api_token):
+def get_available_test_types():
     headers = {
-        "Authorization": f"Token {api_token}",
+        "Authorization": f"Token {SAFESCARF_API_TOKEN}",
         "Content-Type": "application/json",
     }
 
-    response = requests.get(f"{api_url}/api/v2/test_types/?limit=500", headers=headers)
+    response = requests.get(f"{SAFESCARF_URL}/api/v2/test_types/?limit=500", headers=headers)
 
     if response.status_code == 200:
         test_types = response.json().get("results", [])
@@ -55,18 +56,67 @@ def get_available_test_types(api_url, api_token):
         print(f"Failed to fetch test types from the API. Status code: {response.status_code}")
         return []
 
+# checks if the user has access to the provided engagement_id
+def check_engagement_access(engagement_id):
+    headers = {
+        "Authorization": f"Token {SAFESCARF_API_TOKEN}",
+    }
+
+    print(SAFESCARF_API_TOKEN)
+    # Make an API request to check access to the engagement
+    response = requests.get(f"{SAFESCARF_URL}/api/v2/engagements/{engagement_id}/", headers=headers)
+
+    if response.status_code == 200:
+        # The user has access to the engagement
+        print(f"Access to Engagement {engagement_id} is possible.")
+        return True
+    elif response.status_code == 403:
+        # The user does not have access to the engagement
+        print(f"You don't have permissions to access {engagement_id}!")
+        return False
+    else:
+        # Handle other status codes as needed
+        print(f"Failed to check access to engagement {engagement_id}. Status code: {response.status_code}")
+        return None
+
+# checks if a engagement with the specific name does already exist within the product
+def check_engagement_exists(name):
+    headers = {
+        "Authorization": f"Token {SAFESCARF_API_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    response = requests.get(f"{SAFESCARF_URL}/api/v2/engagements/?name={name}&product={SAFESCARF_PRODUCTID}", headers=headers)
+
+    if response.status_code == 200:
+        engagements = response.json().get("results", [])
+        if engagements:
+            return engagements[0]["id"]
+    return None
+
 # Function to create an engagement
 def create_engagement():
+    global SAFESCARF_ENGAGEMENT_ID
+    # Check if SAFESCARF_ENGAGEMENT_ID is set
+    if SAFESCARF_ENGAGEMENT_ID:
+        print("SAFESCARF_ENGAGEMENT_ID is already set. Aborting engagement creation.")
+        return
+
     # Add tags to the tags array using a list comprehension
     tags = ["GITLAB-CI"]
     name = f"#{CI_PIPELINE_ID}"
     version = GITLAB_VERSION_REF
+
     if SAFESCARF_WORKFLOW:
         tags.append("flow:" + SAFESCARF_WORKFLOW)
         # set version depending on workflow
         if SAFESCARF_WORKFLOW == "branch":
             name = CI_COMMIT_REF_NAME # Tag and Branch Pipelines only (no Merge Pipeline)
             version = CI_COMMIT_REF_NAME
+            # Check if an engagement with the same name exists
+            engagement_exists = check_engagement_exists(name)
+            if engagement_exists:
+                print(f"Engagement with the same name already exists. Engagement ID: {engagement_exists}")
+                return
         elif SAFESCARF_WORKFLOW == "pipeline":
             name = f"#{CI_PIPELINE_ID}"
             version = GITLAB_VERSION_REF
@@ -188,6 +238,12 @@ if __name__ == "__main__":
     SAFESCARF_SCAN_ENVIRONMENT = args.environment if args.environment else os.environ.get('SAFESCARF_SCAN_ENVIRONMENT', "")
     SAFESCARF_WORKFLOW = args.workflow if args.workflow else os.environ.get('SAFESCARF_WORKFLOW', "")
 
+    # verify that given engagement id is accessible
+    if int(SAFESCARF_ENGAGEMENT_ID) > 0:
+        res = check_engagement_access(SAFESCARF_ENGAGEMENT_ID)
+        if not res:
+            quit()
+
     if args.command == "create-engagement":
         create_engagement()
     elif args.command == "upload":
@@ -196,7 +252,7 @@ if __name__ == "__main__":
         parser.print_help()
     elif args.command == "test-types":
         if SAFESCARF_URL != "" and SAFESCARF_API_TOKEN != "":
-            print(get_available_test_types(SAFESCARF_URL, SAFESCARF_API_TOKEN))
+            print(get_available_test_types())
         else:
             print("--api-url and --api-key are neccessary for this command!")
     else:
