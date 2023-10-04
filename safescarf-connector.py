@@ -30,7 +30,6 @@ SAFESCARF_ENGAGEMENT_ORCHESTRATION_ENGINE = os.environ.get("SAFESCARF_ENGAGEMENT
 SAFESCARF_SCAN_MINIMUM_SEVERITY = os.environ.get("SAFESCARF_SCAN_MINIMUM_SEVERITY", "Info")
 SAFESCARF_SCAN_ACTIVE = os.environ.get("SAFESCARF_SCAN_ACTIVE", True)
 SAFESCARF_SCAN_VERIFIED = os.environ.get("SAFESCARF_SCAN_VERIFIED", True)
-SAFESCARF_SCAN_TYPE = os.environ.get("SAFESCARF_SCAN_TYPE", "type")
 SAFESCARF_SCAN_CLOSE_OLD_FINDINGS = os.environ.get("SAFESCARF_SCAN_CLOSE_OLD_FINDINGS", True)
 SAFESCARF_SCAN_PUSH_TO_JIRA = os.environ.get("SAFESCARF_SCAN_PUSH_TO_JIRA", False)
 SAFESCARF_SCAN_ENVIRONMENT = os.environ.get("SAFESCARF_SCAN_ENVIRONMENT", "Default")
@@ -39,9 +38,18 @@ SAFESCARF_API_TOKEN = ""
 SAFESCARF_URL = ""
 SAFESCARF_ENGAGEMENT_ID = ""
 SAFESCARF_PRODUCTID = ""
+SAFESCARF_SCAN_TYPE = ""
 SAFESCARF_WORKFLOW = ""
 
-def get_available_test_types():
+TAGS = []
+
+def get_available_scan_types():
+    """
+    Get a list of available scan types from the SafeSCARF API.
+
+    Returns:
+        list: A list of available scan types.
+    """
     headers = {
         "Authorization": f"Token {SAFESCARF_API_TOKEN}",
         "Content-Type": "application/json",
@@ -56,8 +64,33 @@ def get_available_test_types():
         print(f"Failed to fetch test types from the API. Status code: {response.status_code}")
         return []
 
-# checks if the user has access to the provided engagement_id
+def is_valid_scan_type(scan_type):
+    """
+    Check if the provided scan_type is in the list of available_scan_types.
+
+    Args:
+        scan_type (str): The scan type to check.
+
+    Returns:
+        bool: True if scan_type is valid, False otherwise.
+    """
+    available_scan_types = get_available_scan_types()
+    valid = scan_type in available_scan_types
+    if valid:
+        return True
+    print (f"{scan_type} is not a valid scan_type. Please check valid types with command <scan-types>")
+    return False
+
 def check_engagement_access(engagement_id):
+    """
+    Check if the user has access to the provided engagement_id.
+
+    Args:
+        engagement_id (str): The ID of the engagement to check.
+
+    Returns:
+        bool: True if the user has access, False otherwise.
+    """
     headers = {
         "Authorization": f"Token {SAFESCARF_API_TOKEN}",
     }
@@ -79,8 +112,16 @@ def check_engagement_access(engagement_id):
         print(f"Failed to check access to engagement {engagement_id}. Status code: {response.status_code}")
         return None
 
-# checks if a engagement with the specific name does already exist within the product
 def check_engagement_exists(name):
+    """
+    Check if an engagement with the specified name already exists within the product.
+
+    Args:
+        name (str): The name of the engagement to check.
+
+    Returns:
+        str or None: The ID of the existing engagement, or None if it doesn't exist.
+    """
     headers = {
         "Authorization": f"Token {SAFESCARF_API_TOKEN}",
         "Content-Type": "application/json",
@@ -93,8 +134,10 @@ def check_engagement_exists(name):
             return engagements[0]["id"]
     return None
 
-# Function to create an engagement
 def create_engagement():
+    """
+    Create a new engagement using the provided information and settings.
+    """
     global SAFESCARF_ENGAGEMENT_ID
     # Check if SAFESCARF_ENGAGEMENT_ID is set
     if SAFESCARF_ENGAGEMENT_ID:
@@ -103,6 +146,7 @@ def create_engagement():
 
     # Add tags to the tags array using a list comprehension
     tags = ["GITLAB-CI"]
+    tags.extend(TAGS)
     name = f"#{CI_PIPELINE_ID}"
     version = GITLAB_VERSION_REF
 
@@ -161,11 +205,23 @@ def create_engagement():
     else:
         print(f"Failed to create engagement. Status code: {response.status_code}")
 
-# Function to upload files
 def upload(files):
+    """
+    Upload specified files to SafeSCARF as a scan with the provided settings.
+
+    Args:
+        files (list): List of file patterns to upload.
+    """
     if not files:
         print("No files specified. Type 'help' for more information.")
         return
+
+    if not is_valid_scan_type(SAFESCARF_SCAN_TYPE):
+        return
+
+    # Add tags to the tags array using a list comprehension
+    tags = ["GITLAB-CI"]
+    tags.extend(TAGS)
 
     for file_pattern in files:
         matching_files = glob.glob(file_pattern)
@@ -191,7 +247,7 @@ def upload(files):
                     data=data,
                     files=files,
                 )
-                if response.status_code == 200:
+                if response.status_code >= 200 and response.status_code <= 300:
                     print(f"{file} uploaded successfully.")
                 else:
                     print(f"Failed to upload {file}. Status code: {response.status_code}")
@@ -202,7 +258,7 @@ def upload(files):
 parser = argparse.ArgumentParser(description="API Connector for easier integration in workflows.")
 
 # Add an argument for the command
-parser.add_argument("command", choices=["create-engagement", "upload", "help", "test-types"], help="Specify the command")
+parser.add_argument("command", choices=["create-engagement", "upload", "help", "scan-types"], help="Specify the command")
 
 # Add an argument for --workflow
 parser.add_argument("--workflow", choices=["branch", "pipeline"], help="Specify the workflow type for create-engagement")
@@ -222,8 +278,11 @@ parser.add_argument("--environment", help="Specify the scan environment")
 # Add an argument for --product-id
 parser.add_argument("--product-id", help="Specify the product ID as a string")
 
-# Add an argument for --test-type
-parser.add_argument("--test-type", help="Specify the scan type as a string")
+# Add an argument for --tags
+parser.add_argument("--tags", help="Specify semicolon-separated tags")
+
+# Add an argument for --scan-type
+parser.add_argument("--scan-type", help="Specify the scan type as a string")
 
 # Add arguments for files to upload
 parser.add_argument("files", nargs="*", help="Files to upload")
@@ -237,6 +296,7 @@ if __name__ == "__main__":
     SAFESCARF_PRODUCTID = args.product_id if args.product_id else os.environ.get('SAFESCARF_PRODUCTID', "")
     SAFESCARF_SCAN_ENVIRONMENT = args.environment if args.environment else os.environ.get('SAFESCARF_SCAN_ENVIRONMENT', "")
     SAFESCARF_WORKFLOW = args.workflow if args.workflow else os.environ.get('SAFESCARF_WORKFLOW', "")
+    SAFESCARF_SCAN_TYPE = args.scan_type if args.scan_type else os.environ.get('SAFESCARF_SCAN_TYPE', "")
 
     # verify that given engagement id is accessible
     if int(SAFESCARF_ENGAGEMENT_ID) > 0:
@@ -244,6 +304,8 @@ if __name__ == "__main__":
         if not res:
             quit()
 
+    if args.tags:
+        TAGS.extend(args.tags.split(";"))
     if args.command == "create-engagement":
         create_engagement()
     elif args.command == "upload":
@@ -252,7 +314,7 @@ if __name__ == "__main__":
         parser.print_help()
     elif args.command == "test-types":
         if SAFESCARF_URL != "" and SAFESCARF_API_TOKEN != "":
-            print(get_available_test_types())
+            print(get_available_scan_types())
         else:
             print("--api-url and --api-key are neccessary for this command!")
     else:
