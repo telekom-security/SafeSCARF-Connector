@@ -230,6 +230,7 @@ def upload(files):
                 print(f"Uploading {file} to SafeSCARF")
                 files = {"file": (file, open(file, "rb"))}
                 data = {
+                    "tags": tags,
                     "scan_date": TODAY,
                     "minimum_severity": SAFESCARF_SCAN_MINIMUM_SEVERITY,
                     "active": SAFESCARF_SCAN_ACTIVE,
