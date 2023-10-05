@@ -171,7 +171,7 @@ def create_engagement():
             version = GITLAB_VERSION_REF
     engagement_data = {
         "tags": tags,
-        "name": f"#{CI_PIPELINE_ID}",
+        "name": name,
         "description": CI_COMMIT_DESCRIPTION,
         "version": version,
         "first_contacted": TODAY,
