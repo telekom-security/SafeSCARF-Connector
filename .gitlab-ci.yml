@@ -14,6 +14,10 @@ variables:
 lint_readme:
   stage: lint
   image: alpine:latest
+  rules:
+    # don't run on release pipelines when 'X.Y.Z' pattern is created
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+      when: never
   script:
     - apk --no-cache add nodejs npm
     - npm install -g markdownlint-cli
