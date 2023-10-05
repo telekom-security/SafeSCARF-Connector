@@ -161,10 +161,11 @@ def create_engagement():
             name = GITLAB_VERSION_REF # Tag and Branch Pipelines only (no Merge Pipeline)
             version = GITLAB_VERSION_REF
             # Check if an engagement with the same name exists
-            engagement_exists = check_engagement_exists(name)
-            if engagement_exists:
-                os.environ["SAFESCARF_ENGAGEMENT_ID"] = str(SAFESCARF_ENGAGEMENT_ID)  # Export engagement_id
-                print(f"Engagement with the same name already exists. Engagement ID: {engagement_exists}")
+            engagement_id = check_engagement_exists(name)
+            if engagement_id:
+                with open("safescarf.env", "w") as f:
+                    f.write(f"SAFESCARF_ENGAGEMENT_ID={engagement_id}\n")
+                print(f"Engagement with the same name already exists. Engagement ID: {engagement_id}")
                 return
         elif SAFESCARF_WORKFLOW == "pipeline":
             name = f"#{CI_PIPELINE_ID}"
@@ -205,7 +206,8 @@ def create_engagement():
 
     if response.status_code >= 200 and response.status_code < 300:
         SAFESCARF_ENGAGEMENT_ID = response.json().get("id")
-        os.environ["SAFESCARF_ENGAGEMENT_ID"] = str(SAFESCARF_ENGAGEMENT_ID)  # Export engagement_id
+        with open("safescarf.env", "w") as f:
+            f.write(f"SAFESCARF_ENGAGEMENT_ID={SAFESCARF_ENGAGEMENT_ID}\n")
         print(f"Engagement <{SAFESCARF_ENGAGEMENT_ID}> created with workflow type: {SAFESCARF_WORKFLOW}")
     else:
         print(f"Failed to create engagement. Status code: {response.status_code}")
