@@ -159,6 +159,7 @@ def create_engagement():
             # Check if an engagement with the same name exists
             engagement_exists = check_engagement_exists(name)
             if engagement_exists:
+                os.environ["ENGAGEMENTID"] = SAFESCARF_ENGAGEMENT_ID  # Export engagement_id
                 print(f"Engagement with the same name already exists. Engagement ID: {engagement_exists}")
                 return
         elif SAFESCARF_WORKFLOW == "pipeline":
