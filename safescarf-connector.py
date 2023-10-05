@@ -146,6 +146,7 @@ def create_engagement():
     Create a new engagement using the provided information and settings.
     """
     global SAFESCARF_ENGAGEMENT_ID
+    global SAFESCARF_NAME
     # Check if SAFESCARF_ENGAGEMENT_ID is set
     if SAFESCARF_ENGAGEMENT_ID:
         print("SAFESCARF_ENGAGEMENT_ID is already set. Aborting engagement creation.")
