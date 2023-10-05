@@ -24,6 +24,8 @@ build_image:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"${MTR_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${MTR_REGISTRY_USER}" "${MTR_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
@@ -35,19 +37,17 @@ build_image:
         --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
         --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
 
-#scan-docker-image-trivy:
-#  stage: test
-#  image:
-#    name: registry.safescarf.pan-net.cloud/trivy
-#    entrypoint: [""]
-#  variables:
-#    SAFESCARF_ENG_ID: $SAFESCARF_ENG_ID
-#    IMAGE: "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_SHORT_SHA"
-#  script: |-
-#          ci-connector --version
-#          time trivy image --format json \
-#            --output "$CI_PROJECT_DIR/trivy-container-scanning-report.json" "$IMAGE"
-#          ci-connector upload-scan --scanner 'Trivy Scan' -e $SAFESCARF_ENG_ID -f "$CI_PROJECT_DIR/trivy-container-scanning-report.json"
+scan-docker-image-trivy:
+  stage: test
+  image:
+    name: registry.safescarf.pan-net.cloud/trivy
+    entrypoint: [""]
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  script:
+    - ci-connector --version
+    - time trivy image --format json --output "$CI_PROJECT_DIR/trivy-container-scanning-report.json" "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_SHORT_SHA"
+    - ci-connector upload-scan --scanner 'Trivy Scan' -e "${SAFESCARF_ENG_ID}" -f "$CI_PROJECT_DIR/trivy-container-scanning-report.json" --token "$SAFESCARF_API_TOKEN"
 
 publish_release:
   stage: publish
