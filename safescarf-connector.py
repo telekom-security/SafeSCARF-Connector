@@ -43,6 +43,8 @@ SAFESCARF_URL = ""
 SAFESCARF_ENGAGEMENT_ID = ""
 SAFESCARF_PRODUCT_ID = ""
 SAFESCARF_SCAN_TYPE = ""
+SAFESCARF_TEST_SERVICE = ""
+SAFESCARF_VERSION = ""
 SAFESCARF_WORKFLOW = ""
 
 TAGS = []
@@ -152,14 +154,11 @@ def create_engagement():
     tags = ["GITLAB-CI"]
     tags.extend(TAGS)
     name = f"#{CI_PIPELINE_ID}"
-    version = GITLAB_VERSION_REF
 
     if SAFESCARF_WORKFLOW:
         tags.append("flow:" + SAFESCARF_WORKFLOW)
-        # set version depending on workflow
         if SAFESCARF_WORKFLOW == "branch":
             name = GITLAB_VERSION_REF # Tag and Branch Pipelines only (no Merge Pipeline)
-            version = GITLAB_VERSION_REF
             # Check if an engagement with the same name exists
             engagement_id = check_engagement_exists(name)
             if engagement_id:
@@ -169,12 +168,11 @@ def create_engagement():
                 return
         elif SAFESCARF_WORKFLOW == "pipeline":
             name = f"#{CI_PIPELINE_ID}"
-            version = GITLAB_VERSION_REF
     engagement_data = {
         "tags": tags,
         "name": name,
         "description": CI_COMMIT_DESCRIPTION,
-        "version": version,
+        "version": SAFESCARF_VERSION,
         "first_contacted": TODAY,
         "target_start": TODAY,
         "target_end": ENDDAY,
@@ -248,6 +246,8 @@ def upload(files):
                     "close_old_findings": SAFESCARF_SCAN_CLOSE_OLD_FINDINGS,
                     "push_to_jira": SAFESCARF_SCAN_PUSH_TO_JIRA,
                     "environment": SAFESCARF_SCAN_ENVIRONMENT,
+                    "service": SAFESCARF_TEST_SERVICE,
+                    "version": SAFESCARF_VERSION,
                 }
                 headers = {"Authorization": f"Token {SAFESCARF_API_TOKEN}"}
                 response = requests.post(
@@ -294,6 +294,12 @@ parser.add_argument("--tags", help="Specify semicolon-separated tags")
 # Add an argument for --scan-type
 parser.add_argument("--scan-type", help="Specify the scan type as a string")
 
+# Add an argument for --scan-type
+parser.add_argument("--service", help="Specify the tested service within the system (e.g. a container image)")
+
+# Add an argument for --scan-type
+parser.add_argument("--version", help="Specify the version of the engagement (create-engagement) or test (upload) that has been tested. e.g. the version of the container that has been specified with --service")
+
 # Add arguments for files to upload
 parser.add_argument("files", nargs="*", help="Files to upload")
 
@@ -307,6 +313,8 @@ if __name__ == "__main__":
     SAFESCARF_SCAN_ENVIRONMENT = args.environment if args.environment else os.environ.get('SAFESCARF_SCAN_ENVIRONMENT', "")
     SAFESCARF_WORKFLOW = args.workflow if args.workflow else os.environ.get('SAFESCARF_WORKFLOW', "")
     SAFESCARF_SCAN_TYPE = args.scan_type if args.scan_type else os.environ.get('SAFESCARF_SCAN_TYPE', "")
+    SAFESCARF_TEST_SERVICE = args.service if args.service else os.environ.get('SAFESCARF_TEST_SERVICE', "")
+    SAFESCARF_VERSION = args.version if args.version else GITLAB_VERSION_REF
 
     # verify that given engagement id is accessible
     if SAFESCARF_ENGAGEMENT_ID != "" and int(SAFESCARF_ENGAGEMENT_ID) > 0:
