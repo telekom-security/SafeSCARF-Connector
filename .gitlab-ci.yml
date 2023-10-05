@@ -10,7 +10,6 @@ variables:
   README_FILE: README.md
   SAFESCARF_HOST: https://dt-sec.safescarf.pan-net.cloud/
 
-
 lint_readme:
   stage: lint
   image: alpine:latest
@@ -64,10 +63,11 @@ publish_release:
   script:
     - mkdir -p /kaniko/.docker
     - echo "{\"auths\":{\"${MTR_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${MTR_REGISTRY_USER}" "${MTR_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - cat /kaniko/.docker/config.json
     - /kaniko/executor
         --context "${CI_PROJECT_DIR}"
         --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-        --destination "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_TAG"
+        --destination "${MTR_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
         --build-arg http_proxy="http://proxy.devops.telekom.de:3128"
         --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
         --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
