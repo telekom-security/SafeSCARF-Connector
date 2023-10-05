@@ -12,7 +12,7 @@ variables:
 
 lint_readme:
   stage: lint
-  image: alpine:latest
+  image: dockerhub.devops.telekom.de/alpine:latest
   rules:
     # don't run on release pipelines when 'X.Y.Z' pattern is created
     - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'

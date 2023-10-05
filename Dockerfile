@@ -1,5 +1,5 @@
 # Use an official Python runtime as a parent image
-FROM python:3-alpine
+FROM dockerhub.devops.telekom.de/python:3-alpine
 
 # Set environment variables
 ENV SAFESCARF_ENGAGEMENT_PERIOD=7 \
