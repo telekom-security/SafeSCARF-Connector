@@ -203,7 +203,7 @@ def create_engagement():
 
     response = requests.post(f"{SAFESCARF_URL}/api/v2/engagements/", headers=headers, json=engagement_data)
 
-    if response.status_code == 200:
+    if response.status_code >= 200 and response.status_code < 300:
         SAFESCARF_ENGAGEMENT_ID = response.json().get("id")
         os.environ["ENGAGEMENTID"] = SAFESCARF_ENGAGEMENT_ID  # Export engagement_id
         print(f"Engagement <{SAFESCARF_ENGAGEMENT_ID}> created with workflow type: {SAFESCARF_WORKFLOW}")
@@ -254,7 +254,7 @@ def upload(files):
                     data=data,
                     files=files,
                 )
-                if response.status_code >= 200 and response.status_code <= 300:
+                if response.status_code >= 200 and response.status_code < 300:
                     print(f"{file} uploaded successfully.")
                 else:
                     print(f"Failed to upload {file}. Status code: {response.status_code}")
