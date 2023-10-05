@@ -301,7 +301,7 @@ if __name__ == "__main__":
     SAFESCARF_SCAN_TYPE = args.scan_type if args.scan_type else os.environ.get('SAFESCARF_SCAN_TYPE', "")
 
     # verify that given engagement id is accessible
-    if int(SAFESCARF_ENGAGEMENT_ID) > 0:
+    if SAFESCARF_ENGAGEMENT_ID != "" and int(SAFESCARF_ENGAGEMENT_ID) > 0:
         res = check_engagement_access(SAFESCARF_ENGAGEMENT_ID)
         if not res:
             quit()
