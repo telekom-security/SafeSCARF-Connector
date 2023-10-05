@@ -37,7 +37,7 @@ SAFESCARF_SCAN_ENVIRONMENT = os.environ.get("SAFESCARF_SCAN_ENVIRONMENT", "Defau
 SAFESCARF_API_TOKEN = ""
 SAFESCARF_URL = ""
 SAFESCARF_ENGAGEMENT_ID = ""
-SAFESCARF_PRODUCTID = ""
+SAFESCARF_PRODUCT_ID = ""
 SAFESCARF_SCAN_TYPE = ""
 SAFESCARF_WORKFLOW = ""
 
@@ -126,7 +126,7 @@ def check_engagement_exists(name):
         "Authorization": f"Token {SAFESCARF_API_TOKEN}",
         "Content-Type": "application/json",
     }
-    response = requests.get(f"{SAFESCARF_URL}/api/v2/engagements/?name={name}&product={SAFESCARF_PRODUCTID}", headers=headers)
+    response = requests.get(f"{SAFESCARF_URL}/api/v2/engagements/?name={name}&product={SAFESCARF_PRODUCT_ID}", headers=headers)
 
     if response.status_code == 200:
         engagements = response.json().get("results", [])
@@ -184,7 +184,7 @@ def create_engagement():
         "commit_hash": CI_COMMIT_SHORT_SHA,
         "branch_tag": CI_COMMIT_REF_NAME,
         "deduplication_on_engagement": SAFESCARF_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT,
-        "product": SAFESCARF_PRODUCTID,
+        "product": SAFESCARF_PRODUCT_ID,
         "source_code_management_uri": f"{CI_PROJECT_URL}/-/tree/{CI_COMMIT_REF_NAME}/",
         "build_server": SAFESCARF_ENGAGEMENT_BUILD_SERVER,
         "source_code_management_server": SAFESCARF_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER,
@@ -294,7 +294,7 @@ if __name__ == "__main__":
     SAFESCARF_API_TOKEN = args.api_key if args.api_key else os.environ.get('SAFESCARF_TOKEN', "")
     SAFESCARF_URL = args.api_url if args.api_url else os.environ.get('SAFESCARF_URL', "")
     SAFESCARF_ENGAGEMENT_ID = args.engagement_id if args.engagement_id else os.environ.get('ENGAGEMENTID', "")
-    SAFESCARF_PRODUCTID = args.product_id if args.product_id else os.environ.get('SAFESCARF_PRODUCTID', "")
+    SAFESCARF_PRODUCT_ID = args.product_id if args.product_id else os.environ.get('SAFESCARF_PRODUCT_ID', "")
     SAFESCARF_SCAN_ENVIRONMENT = args.environment if args.environment else os.environ.get('SAFESCARF_SCAN_ENVIRONMENT', "")
     SAFESCARF_WORKFLOW = args.workflow if args.workflow else os.environ.get('SAFESCARF_WORKFLOW', "")
     SAFESCARF_SCAN_TYPE = args.scan_type if args.scan_type else os.environ.get('SAFESCARF_SCAN_TYPE', "")
