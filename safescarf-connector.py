@@ -163,7 +163,7 @@ def create_engagement():
             # Check if an engagement with the same name exists
             engagement_exists = check_engagement_exists(name)
             if engagement_exists:
-                os.environ["ENGAGEMENTID"] = SAFESCARF_ENGAGEMENT_ID  # Export engagement_id
+                os.environ["ENGAGEMENTID"] = str(SAFESCARF_ENGAGEMENT_ID)  # Export engagement_id
                 print(f"Engagement with the same name already exists. Engagement ID: {engagement_exists}")
                 return
         elif SAFESCARF_WORKFLOW == "pipeline":
@@ -205,7 +205,7 @@ def create_engagement():
 
     if response.status_code >= 200 and response.status_code < 300:
         SAFESCARF_ENGAGEMENT_ID = response.json().get("id")
-        os.environ["ENGAGEMENTID"] = SAFESCARF_ENGAGEMENT_ID  # Export engagement_id
+        os.environ["ENGAGEMENTID"] = str(SAFESCARF_ENGAGEMENT_ID)  # Export engagement_id
         print(f"Engagement <{SAFESCARF_ENGAGEMENT_ID}> created with workflow type: {SAFESCARF_WORKFLOW}")
     else:
         print(f"Failed to create engagement. Status code: {response.status_code}")
