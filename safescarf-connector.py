@@ -206,6 +206,7 @@ def create_engagement():
         print(f"Engagement <{SAFESCARF_ENGAGEMENT_ID}> created with workflow type: {SAFESCARF_WORKFLOW}")
     else:
         print(f"Failed to create engagement. Status code: {response.status_code}")
+        print(f"Error message: {response.text}")
 
 def upload(files):
     """
@@ -254,6 +255,7 @@ def upload(files):
                     print(f"{file} uploaded successfully.")
                 else:
                     print(f"Failed to upload {file}. Status code: {response.status_code}")
+                    print(f"Error message: {response.text}")
             else:
                 print(f"{file} is not a valid file or is empty.")
 
