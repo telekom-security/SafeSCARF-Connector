@@ -154,8 +154,8 @@ def create_engagement():
         tags.append("flow:" + SAFESCARF_WORKFLOW)
         # set version depending on workflow
         if SAFESCARF_WORKFLOW == "branch":
-            name = CI_COMMIT_REF_NAME # Tag and Branch Pipelines only (no Merge Pipeline)
-            version = CI_COMMIT_REF_NAME
+            name = GITLAB_VERSION_REF # Tag and Branch Pipelines only (no Merge Pipeline)
+            version = GITLAB_VERSION_REF
             # Check if an engagement with the same name exists
             engagement_exists = check_engagement_exists(name)
             if engagement_exists:
@@ -183,10 +183,10 @@ def create_engagement():
         "engagement_type": "CI/CD",
         "build_id": CI_PIPELINE_ID,
         "commit_hash": CI_COMMIT_SHORT_SHA,
-        "branch_tag": CI_COMMIT_REF_NAME,
+        "branch_tag": GITLAB_VERSION_REF,
         "deduplication_on_engagement": SAFESCARF_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT,
         "product": SAFESCARF_PRODUCT_ID,
-        "source_code_management_uri": f"{CI_PROJECT_URL}/-/tree/{CI_COMMIT_REF_NAME}/",
+        "source_code_management_uri": f"{CI_PROJECT_URL}/-/tree/{GITLAB_VERSION_REF}/",
         "build_server": SAFESCARF_ENGAGEMENT_BUILD_SERVER,
         "source_code_management_server": SAFESCARF_ENGAGEMENT_SOURCE_CODE_MANAGEMENT_SERVER,
         "orchestration_engine": SAFESCARF_ENGAGEMENT_ORCHESTRATION_ENGINE,
