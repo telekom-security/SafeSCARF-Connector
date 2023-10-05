@@ -163,7 +163,7 @@ def create_engagement():
             # Check if an engagement with the same name exists
             engagement_exists = check_engagement_exists(name)
             if engagement_exists:
-                os.environ["ENGAGEMENTID"] = str(SAFESCARF_ENGAGEMENT_ID)  # Export engagement_id
+                os.environ["SAFESCARF_ENGAGEMENT_ID"] = str(SAFESCARF_ENGAGEMENT_ID)  # Export engagement_id
                 print(f"Engagement with the same name already exists. Engagement ID: {engagement_exists}")
                 return
         elif SAFESCARF_WORKFLOW == "pipeline":
@@ -205,7 +205,7 @@ def create_engagement():
 
     if response.status_code >= 200 and response.status_code < 300:
         SAFESCARF_ENGAGEMENT_ID = response.json().get("id")
-        os.environ["ENGAGEMENTID"] = str(SAFESCARF_ENGAGEMENT_ID)  # Export engagement_id
+        os.environ["SAFESCARF_ENGAGEMENT_ID"] = str(SAFESCARF_ENGAGEMENT_ID)  # Export engagement_id
         print(f"Engagement <{SAFESCARF_ENGAGEMENT_ID}> created with workflow type: {SAFESCARF_WORKFLOW}")
     else:
         print(f"Failed to create engagement. Status code: {response.status_code}")
@@ -300,7 +300,7 @@ if __name__ == "__main__":
 
     SAFESCARF_API_TOKEN = args.api_key if args.api_key else os.environ.get('SAFESCARF_TOKEN', "")
     SAFESCARF_URL = args.api_url if args.api_url else os.environ.get('SAFESCARF_URL', "")
-    SAFESCARF_ENGAGEMENT_ID = args.engagement_id if args.engagement_id else os.environ.get('ENGAGEMENTID', "")
+    SAFESCARF_ENGAGEMENT_ID = args.engagement_id if args.engagement_id else os.environ.get('SAFESCARF_ENGAGEMENT_ID', "")
     SAFESCARF_PRODUCT_ID = args.product_id if args.product_id else os.environ.get('SAFESCARF_PRODUCT_ID', "")
     SAFESCARF_SCAN_ENVIRONMENT = args.environment if args.environment else os.environ.get('SAFESCARF_SCAN_ENVIRONMENT', "")
     SAFESCARF_WORKFLOW = args.workflow if args.workflow else os.environ.get('SAFESCARF_WORKFLOW', "")
