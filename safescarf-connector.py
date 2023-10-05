@@ -13,6 +13,7 @@ TODAY = os.environ.get("TODAY", (datetime.now()).strftime("%Y-%m-%d"))
 ENDDAY = os.environ.get("ENDDAY", (datetime.now() + timedelta(days=SAFESCARF_ENGAGEMENT_PERIOD)).strftime("%Y-%m-%d"))
 CI_PIPELINE_ID = os.environ.get("CI_PIPELINE_ID", "")
 CI_COMMIT_DESCRIPTION = os.environ.get("CI_COMMIT_DESCRIPTION", "Commit description")
+CI_COMMIT_SHORT_SHA = os.environ.get("CI_COMMIT_SHORT_SHA", "")
 GITLAB_VERSION_REF = os.environ["CI_MERGE_REQUEST_ID"] if "CI_MERGE_REQUEST_ID" in os.environ \
                     else os.environ["CI_COMMIT_REF_NAME"] if "CI_COMMIT_REF_NAME" in os.environ \
                     else os.environ["CI_COMMIT_TAG"] if "CI_COMMIT_TAG" in os.environ \
