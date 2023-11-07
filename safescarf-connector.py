@@ -37,6 +37,8 @@ SAFESCARF_SCAN_CLOSE_OLD_FINDINGS = os.environ.get("SAFESCARF_SCAN_CLOSE_OLD_FIN
 SAFESCARF_SCAN_PUSH_TO_JIRA = os.environ.get("SAFESCARF_SCAN_PUSH_TO_JIRA", False)
 SAFESCARF_SCAN_ENVIRONMENT = os.environ.get("SAFESCARF_SCAN_ENVIRONMENT", "Default")
 
+SAFESCARF_PRODUCT_NAME = ""
+
 SAFESCARF_API_TOKEN = ""
 SAFESCARF_URL = ""
 SAFESCARF_ENGAGEMENT_ID = ""
@@ -220,6 +222,30 @@ def create_engagement():
         print(f"Failed to create engagement. Status code: {response.status_code}")
         print(f"Error message: {response.text}")
 
+def get_product_name(product_id) -> str:
+    """
+    Get the name of a product using its Product ID.
+
+    Args:
+        product_id (int): The Product ID for which to retrieve the name.
+
+    Returns:
+        str: The name of the product, or an empty string if the request fails.
+    """
+    headers = {
+        "Authorization": f"Token {SAFESCARF_API_TOKEN}",
+    }
+
+    response = requests.get(f"{SAFESCARF_URL}/api/v2/products/{product_id}/", headers=headers)
+
+    if response.status_code == 200:
+        product_data = response.json()
+        return product_data.get("name", "")
+    else:
+        print(f"Failed to fetch product data. Status code: {response.status_code}")
+        return ""
+
+
 def upload(files):
     """
     Upload specified files to SafeSCARF as a scan with the provided settings.
@@ -272,6 +298,7 @@ def upload(files):
                 headers = {"Authorization": f"Token {SAFESCARF_API_TOKEN}"}
                 response = ""
                 if SAFESCARF_REIMPORT:
+                    data["product_name"] = get_product_name(SAFESCARF_PRODUCT_ID)
                     response = requests.post(
                     f"{SAFESCARF_URL}/api/v2/reimport-scan/",
                         headers=headers,
