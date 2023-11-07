@@ -8,7 +8,7 @@ import glob
 from datetime import datetime, timedelta  # Import the datetime module
 
 # Set default values for environment variables
-SAFESCARF_ENGAGEMENT_PERIOD = 7
+SAFESCARF_ENGAGEMENT_PERIOD = os.environ.get("SAFESCARF_ENGAGEMENT_THREAT_MODEL", 7)
 TODAY = os.environ.get("TODAY", (datetime.now()).strftime("%Y-%m-%d"))
 ENDDAY = os.environ.get("ENDDAY", (datetime.now() + timedelta(days=SAFESCARF_ENGAGEMENT_PERIOD)).strftime("%Y-%m-%d"))
 CI_COMMIT_DESCRIPTION = os.environ.get("CI_COMMIT_DESCRIPTION", "Commit description")
@@ -146,6 +146,30 @@ def check_engagement_exists(name):
         if engagements:
             return engagements[0]["id"]
     return None
+
+def check_test_exists(engagement_id, test_title):
+    """
+    Check if a test with the provided title exists within the specified engagement.
+
+    Args:
+        engagement_id (str): The ID of the engagement to check.
+        test_title (str): The title of the test to check.
+
+    Returns:
+        bool: True if a test with the same title exists, False otherwise.
+    """
+    headers = {
+        "Authorization": f"Token {SAFESCARF_API_TOKEN}",
+    }
+
+    response = requests.get(f"{SAFESCARF_URL}/api/v2/engagements/{engagement_id}/tests/?test__title={test_title}", headers=headers)
+
+    if response.status_code == 200:
+        tests = response.json().get("results", [])
+        return bool(tests)
+    else:
+        print(f"Failed to fetch tests for engagement {engagement_id}. Status code: {response.status_code}")
+        return False
 
 def create_engagement():
     """
@@ -288,6 +312,14 @@ def upload(files):
     tags = ["GITLAB-CI"]
     tags.extend(TAGS)
 
+    reimport = SAFESCARF_REIMPORT
+
+    # Check if a test with the same title exists in the engagement
+    if SAFESCARF_ENGAGEMENT_ID and SAFESCARF_NAME and check_test_exists(SAFESCARF_ENGAGEMENT_ID, SAFESCARF_NAME):
+        reimport = True
+    else:
+        reimport = False
+
     for file_pattern in files:
         matching_files = glob.glob(file_pattern)
         for file in matching_files:
@@ -309,9 +341,6 @@ def upload(files):
                     "version": SAFESCARF_VERSION,
                     "test_title": SAFESCARF_NAME,
                 }
-
-                if SAFESCARF_REIMPORT:
-                    data["do_not_reactivate"] = SAFESCARF_REIMPORT_DO_NOT_REACTIVATE
                 if SAFESCARF_BRANCH_TAG != "":
                     data["branch_tag"] = SAFESCARF_BRANCH_TAG
                 if SAFESCARF_COMMIT_HASH != "":
@@ -321,11 +350,13 @@ def upload(files):
 
                 headers = {"Authorization": f"Token {SAFESCARF_API_TOKEN}"}
                 response = ""
-                if SAFESCARF_REIMPORT:
+
+                if reimport:
+                    data["do_not_reactivate"] = SAFESCARF_REIMPORT_DO_NOT_REACTIVATE
                     data["product_name"] = get_product_name(SAFESCARF_PRODUCT_ID)
                     data["engagement_name"] = get_engagement_name(SAFESCARF_ENGAGEMENT_ID)
                     response = requests.post(
-                    f"{SAFESCARF_URL}/api/v2/reimport-scan/",
+                        f"{SAFESCARF_URL}/api/v2/reimport-scan/",
                         headers=headers,
                         data=data,
                         files=files,

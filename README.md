@@ -20,26 +20,26 @@ The SafeSCARF API Connector provides the following functionality:
 
 Here are the parameters you can use when running the script:
 
-| Parameter                | Description                                                                                                 | Mandatory |
-|--------------------------|-------------------------------------------------------------------------------------------------------------|-----------|
-| `command`                | Specifies the command to execute. Available options: `create-engagement`, `upload`, `help`, `scan-types`.   | Yes       |
-| `--workflow`             | Specifies the workflow type for creating engagements. Available options: `branch`, `pipeline`.              | No        |
-| `--api-key`              | Specifies the SafeSCARF API key as a string.                                                                | Partially |
-| `--api-url`              | Specifies the custom SafeSCARF API URL as a string.                                                         | Partially |
-| `--branch-tag`           | Specifies the branch or tag that has been scanned.                                                          | Recommended |
-| `--build-id`             | Specifies the build ID for revision.                                                                        | Recommended |
-| `--commit-hash`          | Specifies the commit hash for revision.                                                                     | Recommended |
-| `--do-not-reactivate`    | Decide whether to reactivate findings during re-import scan.                                                | No        |
-| `--engagement-id`        | Specifies the engagement ID as an integer.                                                                  | No        |
-| `--environment`          | Specifies the scan environment.                                                                             | No        |
-| `--product-id`           | Specifies the product ID as a string.                                                                       | No        |
-| `--reimport`             | Decide whether to upload or reimport the scan.                                                              | No        |
-| `--tags`                 | Specifies semicolon-separated tags.                                                                        | No        |
-| `--scan-type`            | Specifies the scan type as a string.                                                                        | No        |
-| `--service`              | Specifies the tested service within the system (e.g., a container image).                                    | for upload |
-| `--version`              | Specifies the version of the engagement (create-engagement) or test (upload).                                | No        |
-| `--name`                 | Name the engagement (create-engagement) or current test result to be uploaded (upload).                      | No        |
-| `files`                  | Files to upload. (only for upload command)                                                                  | No        |
+| Parameter                | Description                                                                                                 | Datatype  | Mandatory |
+|--------------------------|-------------------------------------------------------------------------------------------------------------|-----------|-----------|
+| `command`                | Specifies the command to execute. Available options: `create-engagement`, `upload`, `help`, `scan-types`.   | string    | Yes       |
+| `--workflow`             | Specifies the workflow type for creating engagements. Available options: `branch`, `pipeline`.              | string    | No        |
+| `--api-key`              | Specifies the SafeSCARF API key as a string.                                                                | string    | Partially |
+| `--api-url`              | Specifies the custom SafeSCARF API URL as a string.                                                         | string    | Partially |
+| `--branch-tag`           | Specifies the branch or tag that has been scanned.                                                          | string    | No        |
+| `--build-id`             | Specifies the build ID for revision.                                                                        | string    | Recommended |
+| `--commit-hash`          | Specifies the commit hash for revision.                                                                     | string    | Recommended |
+| `--do-not-reactivate`    | Decide whether to reactivate findings during re-import scan.                                                | bool      | No        |
+| `--engagement-id`        | Specifies the engagement ID as an integer.                                                                  | int       | No        |
+| `--environment`          | Specifies the scan environment.                                                                             | string    | No        |
+| `--product-id`           | Specifies the product ID as a string.                                                                       | string    | No        |
+| `--reimport`             | Decide whether to upload or reimport the scan.                                                              | bool      | No        |
+| `--tags`                 | Specifies semicolon-separated tags.                                                                         | string    | No        |
+| `--scan-type`            | Specifies the scan type as a string.                                                                        | string    | No        |
+| `--service`              | Specifies the tested service within the system (e.g., a container image).                                   | string    | for upload |
+| `--version`              | Specifies the version of the engagement (create-engagement) or test (upload).                               | string    | No        |
+| `--name`                 | Name the engagement (create-engagement) or current test result to be uploaded (upload).                     | string    | No        |
+| `files`                  | Files to upload. (only for upload command)                                                                  | string    | No        |
 
 > Partially mandatory means that this value must be provided via command line or
 > as environmental variable
