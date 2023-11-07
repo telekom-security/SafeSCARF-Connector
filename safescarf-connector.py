@@ -416,7 +416,7 @@ if __name__ == "__main__":
     SAFESCARF_VERSION = args.version if args.version else GITLAB_VERSION_REF
     SAFESCARF_NAME = args.name if args.name else os.environ.get('SAFESCARF_NAME', "")
     SAFESCARF_REIMPORT_DO_NOT_REACTIVATE = args.do_not_reactivate if args.do_not_reactivate else os.environ.get('SAFESCARF_REIMPORT_DO_NOT_REACTIVATE', False)
-    SAFESCARF_BRANCH_TAG = args.branch_tag if args.branch_tag else os.environ.get('SAFESCARF_BRANCH_TAG', "")
+    SAFESCARF_BRANCH_TAG = args.branch_tag if args.branch_tag else os.environ.get('SAFESCARF_BRANCH_TAG', GITLAB_VERSION_REF)
     SAFESCARF_COMMIT_HASH = args.commit_hash if args.commit_hash else os.environ.get('SAFESCARF_COMMIT_HASH', "")
     SAFESCARF_BUILD_ID = args.build_id if args.build_id else os.environ.get('SAFESCARF_BUILD_ID', "")
     SAFESCARF_REIMPORT = args.reimport if args.reimport else os.environ.get('SAFESCARF_REIMPORT', True)
