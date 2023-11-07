@@ -222,6 +222,30 @@ def create_engagement():
         print(f"Failed to create engagement. Status code: {response.status_code}")
         print(f"Error message: {response.text}")
 
+def get_engagement_name(engagement_id):
+    """
+    Get the name of an engagement using its Engagement ID.
+
+    Args:
+        engagement_id (str): The Engagement ID for which to retrieve the name.
+
+    Returns:
+        str: The name of the engagement, or an empty string if the request fails.
+    """
+    headers = {
+        "Authorization": f"Token {SAFESCARF_API_TOKEN}",
+    }
+
+    response = requests.get(f"{SAFESCARF_URL}/api/v2/engagements/{engagement_id}/", headers=headers)
+
+    if response.status_code == 200:
+        engagement_data = response.json()
+        return engagement_data.get("name", "")
+    else:
+        print(f"Failed to fetch engagement data. Status code: {response.status_code}")
+        return ""
+
+
 def get_product_name(product_id) -> str:
     """
     Get the name of a product using its Product ID.
@@ -299,6 +323,7 @@ def upload(files):
                 response = ""
                 if SAFESCARF_REIMPORT:
                     data["product_name"] = get_product_name(SAFESCARF_PRODUCT_ID)
+                    data["engagement_name"] = get_engagement_name(SAFESCARF_ENGAGEMENT_ID)
                     response = requests.post(
                     f"{SAFESCARF_URL}/api/v2/reimport-scan/",
                         headers=headers,
