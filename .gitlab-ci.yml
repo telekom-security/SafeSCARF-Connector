@@ -9,6 +9,14 @@ variables:
   MTR_REGISTRY_IMAGE: mtr.devops.telekom.de/secureops/safescarf-connector
   README_FILE: README.md
   SAFESCARF_HOST: https://dt-sec.safescarf.pan-net.cloud/
+  # dind
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+
+services:
+  - name: 'dockerhub.devops.telekom.de/docker:dind'
+    command: ['--registry-mirror=https://dockerhub.devops.telekom.de']
+    alias: docker
 
 lint_readme:
   stage: lint
