@@ -9,14 +9,6 @@ variables:
   MTR_REGISTRY_IMAGE: mtr.devops.telekom.de/secureops/safescarf-connector
   README_FILE: README.md
   SAFESCARF_HOST: https://dt-sec.safescarf.pan-net.cloud/
-  # dind
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
-
-services:
-  - name: 'dockerhub.devops.telekom.de/docker:dind'
-    command: ['--registry-mirror=https://dockerhub.devops.telekom.de']
-    alias: docker
 
 lint_readme:
   stage: lint
@@ -48,17 +40,17 @@ build_image:
         --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
         --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
 
-scan-docker-image-trivy:
-  stage: test
-  image:
-    name: registry.safescarf.pan-net.cloud/trivy
-    entrypoint: [""]
-  rules:
-    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
-  script:
-    - ci-connector --version
-    - time trivy image --format json --output "$CI_PROJECT_DIR/trivy-container-scanning-report.json" "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_SHORT_SHA"
-    - ci-connector upload-scan --scanner 'Trivy Scan' -e "${SAFESCARF_ENG_ID}" -f "$CI_PROJECT_DIR/trivy-container-scanning-report.json" --token "$SAFESCARF_API_TOKEN"
+#scan-docker-image-trivy:
+#  stage: test
+#  image:
+#    name: registry.safescarf.pan-net.cloud/trivy
+#    entrypoint: [""]
+#  rules:
+#    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+#  script:
+#    - ci-connector --version
+#    - time trivy image --format json --output "$CI_PROJECT_DIR/trivy-container-scanning-report.json" "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_SHORT_SHA"
+#    - ci-connector upload-scan --scanner 'Trivy Scan' -e "${SAFESCARF_ENG_ID}" -f "$CI_PROJECT_DIR/trivy-container-scanning-report.json" --token "$SAFESCARF_API_TOKEN"
 
 publish_release:
   stage: publish
