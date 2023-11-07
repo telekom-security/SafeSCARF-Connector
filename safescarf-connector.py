@@ -47,8 +47,8 @@ SAFESCARF_VERSION = ""
 SAFESCARF_WORKFLOW = ""
 SAFESCARF_NAME = ""
 SAFESCARF_REIMPORT_DO_NOT_REACTIVATE = ""
-SAFESACRF_BRANCH_TAG = ""
-SAFESACRF_COMMIT_HASH = ""
+SAFESCARF_BRANCH_TAG = ""
+SAFESCARF_COMMIT_HASH = ""
 SAFESCARF_BUILD_ID = ""
 SAFESCARF_REIMPORT = True
 
@@ -262,8 +262,8 @@ def upload(files):
 
                 if SAFESCARF_REIMPORT:
                     data["do_not_reactivate"] = SAFESCARF_REIMPORT_DO_NOT_REACTIVATE
-                if SAFESACRF_BRANCH_TAG != "":
-                    data["branch_tag"] = SAFESACRF_BRANCH_TAG
+                if SAFESCARF_BRANCH_TAG != "":
+                    data["branch_tag"] = SAFESCARF_BRANCH_TAG
                 if SAFESCARF_COMMIT_HASH != "":
                     data["commit_hash"] = SAFESCARF_COMMIT_HASH
                 if SAFESCARF_BUILD_ID != "":
@@ -364,8 +364,8 @@ if __name__ == "__main__":
     SAFESCARF_VERSION = args.version if args.version else GITLAB_VERSION_REF
     SAFESCARF_NAME = args.name if args.name else os.environ.get('SAFESCARF_NAME', "")
     SAFESCARF_REIMPORT_DO_NOT_REACTIVATE = args.do_not_reactivate if args.do_not_reactivate else os.environ.get('SAFESCARF_REIMPORT_DO_NOT_REACTIVATE', False)
-    SAFESACRF_BRANCH_TAG = args.branch_tag if args.branch_tag else os.environ.get('SAFESACRF_BRANCH_TAG', "")
-    SAFESACRF_COMMIT_HASH = args.commit_hash if args.commit_hash else os.environ.get('SAFESACRF_COMMIT_HASH', "")
+    SAFESCARF_BRANCH_TAG = args.branch_tag if args.branch_tag else os.environ.get('SAFESCARF_BRANCH_TAG', "")
+    SAFESCARF_COMMIT_HASH = args.commit_hash if args.commit_hash else os.environ.get('SAFESCARF_COMMIT_HASH', "")
     SAFESCARF_BUILD_ID = args.build_id if args.build_id else os.environ.get('SAFESCARF_BUILD_ID', "")
     SAFESCARF_REIMPORT = args.reimport if args.reimport else os.environ.get('SAFESCARF_REIMPORT', True)
 
