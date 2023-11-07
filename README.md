@@ -26,9 +26,14 @@ Here are the parameters you can use when running the script:
 | `--workflow`             | Specifies the workflow type for creating engagements. Available options: `branch`, `pipeline`.              | No        |
 | `--api-key`              | Specifies the SafeSCARF API key as a string.                                                                | Partially |
 | `--api-url`              | Specifies the custom SafeSCARF API URL as a string.                                                         | Partially |
+| `--branch-tag`           | Specifies the branch or tag that has been scanned.                                                          | Recommended |
+| `--build-id`             | Specifies the build ID for revision.                                                                        | Recommended |
+| `--commit-hash`          | Specifies the commit hash for revision.                                                                     | Recommended |
+| `--do-not-reactivate`    | Decide whether to reactivate findings during re-import scan.                                                | No        |
 | `--engagement-id`        | Specifies the engagement ID as an integer.                                                                  | No        |
 | `--environment`          | Specifies the scan environment.                                                                             | No        |
 | `--product-id`           | Specifies the product ID as a string.                                                                       | No        |
+| `--reimport`             | Decide whether to upload or reimport the scan.                                                              | No        |
 | `--tags`                 | Specifies semicolon-separated tags.                                                                        | No        |
 | `--scan-type`            | Specifies the scan type as a string.                                                                        | No        |
 | `--service`              | Specifies the tested service within the system (e.g., a container image).                                    | for upload |

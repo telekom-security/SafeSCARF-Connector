@@ -11,7 +11,6 @@ from datetime import datetime, timedelta  # Import the datetime module
 SAFESCARF_ENGAGEMENT_PERIOD = 7
 TODAY = os.environ.get("TODAY", (datetime.now()).strftime("%Y-%m-%d"))
 ENDDAY = os.environ.get("ENDDAY", (datetime.now() + timedelta(days=SAFESCARF_ENGAGEMENT_PERIOD)).strftime("%Y-%m-%d"))
-CI_PIPELINE_ID = os.environ.get("CI_PIPELINE_ID", "")
 CI_COMMIT_DESCRIPTION = os.environ.get("CI_COMMIT_DESCRIPTION", "Commit description")
 CI_COMMIT_SHORT_SHA = os.environ.get("CI_COMMIT_SHORT_SHA", "")
 GITLAB_VERSION_REF = os.environ["CI_MERGE_REQUEST_ID"] if "CI_MERGE_REQUEST_ID" in os.environ \
@@ -47,6 +46,11 @@ SAFESCARF_TEST_SERVICE = ""
 SAFESCARF_VERSION = ""
 SAFESCARF_WORKFLOW = ""
 SAFESCARF_NAME = ""
+SAFESCARF_REIMPORT_DO_NOT_REACTIVATE = ""
+SAFESACRF_BRANCH_TAG = ""
+SAFESACRF_COMMIT_HASH = ""
+SAFESCARF_BUILD_ID = ""
+SAFESCARF_REIMPORT = True
 
 TAGS = []
 
@@ -158,7 +162,7 @@ def create_engagement():
 
     # default engagement name to pipeline id
     if SAFESCARF_NAME == "":
-        SAFESCARF_NAME = f"#{CI_PIPELINE_ID}"
+        SAFESCARF_NAME = f"#{SAFESCARF_BUILD_ID}"
 
     if SAFESCARF_WORKFLOW:
         tags.append("flow:" + SAFESCARF_WORKFLOW)
@@ -172,7 +176,7 @@ def create_engagement():
                 print(f"Engagement with the same name already exists. Engagement ID: {engagement_id}")
                 return
         elif SAFESCARF_WORKFLOW == "pipeline":
-            SAFESCARF_NAME = f"#{CI_PIPELINE_ID}"
+            SAFESCARF_NAME = f"#{SAFESCARF_BUILD_ID}"
     engagement_data = {
         "tags": tags,
         "name": SAFESCARF_NAME,
@@ -189,7 +193,7 @@ def create_engagement():
         "check_list": SAFESCARF_ENGAGEMENT_CHECK_LIST,
         "status": SAFESCARF_ENGAGEMENT_STATUS,
         "engagement_type": "CI/CD",
-        "build_id": CI_PIPELINE_ID,
+        "build_id": SAFESCARF_BUILD_ID,
         "commit_hash": CI_COMMIT_SHORT_SHA,
         "branch_tag": GITLAB_VERSION_REF,
         "deduplication_on_engagement": SAFESCARF_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT,
@@ -255,13 +259,32 @@ def upload(files):
                     "version": SAFESCARF_VERSION,
                     "test_title": SAFESCARF_NAME,
                 }
+
+                if SAFESCARF_REIMPORT:
+                    data["do_not_reactivate"] = SAFESCARF_REIMPORT_DO_NOT_REACTIVATE
+                if SAFESACRF_BRANCH_TAG != "":
+                    data["branch_tag"] = SAFESACRF_BRANCH_TAG
+                if SAFESCARF_COMMIT_HASH != "":
+                    data["commit_hash"] = SAFESCARF_COMMIT_HASH
+                if SAFESCARF_BUILD_ID != "":
+                    data["build_id"] = SAFESCARF_BUILD_ID
+
                 headers = {"Authorization": f"Token {SAFESCARF_API_TOKEN}"}
-                response = requests.post(
-                    f"{SAFESCARF_URL}/api/v2/import-scan/",
-                    headers=headers,
-                    data=data,
-                    files=files,
-                )
+                response = ""
+                if SAFESCARF_REIMPORT:
+                    response = requests.post(
+                    f"{SAFESCARF_URL}/api/v2/reimport-scan/",
+                        headers=headers,
+                        data=data,
+                        files=files,
+                    )
+                else:
+                    response = requests.post(
+                        f"{SAFESCARF_URL}/api/v2/import-scan/",
+                        headers=headers,
+                        data=data,
+                        files=files,
+                    )
                 if response.status_code >= 200 and response.status_code < 300:
                     print(f"{file} uploaded successfully.")
                 else:
@@ -285,17 +308,32 @@ parser.add_argument("--api-key", help="Specify the API key as a string")
 # Add an argument for --api-url
 parser.add_argument("--api-url", help="Specify the custom API URL as a string")
 
+# Add an argument for --branch-tag
+parser.add_argument("--branch-tag", help="Specify the branch or tag that has been scanned")
+
+# Add an argument for --build-id
+parser.add_argument("--build-id", help="Specify the build id for revision")
+
+# Add an argument for --commit-hash
+parser.add_argument("--commit-hash", help="Specify the commit hash for revision")
+
+# Add an argument for --do-not-reactivate
+parser.add_argument("--do-not-reactivate", help="Reactivate findings during re-import scan")
+
 # Add an argument for --engagement-id
 parser.add_argument("--engagement-id", help="Specify the engagement ID as an integer")
 
 # Add an argument for --environment
 parser.add_argument("--environment", help="Specify the scan environment")
 
-# Add an argument for --test-title
+# Add an argument for --name
 parser.add_argument("--name", help="Name the engagement (create-engagement) or current test result to be uploaded (upload)")
 
 # Add an argument for --product-id
 parser.add_argument("--product-id", help="Specify the product ID as a string")
+
+# Add an argument for --reimport
+parser.add_argument("--reimport", help="Decide whether to upload or reimport the scan")
 
 # Add an argument for --tags
 parser.add_argument("--tags", help="Specify semicolon-separated tags")
@@ -325,6 +363,11 @@ if __name__ == "__main__":
     SAFESCARF_TEST_SERVICE = args.service if args.service else os.environ.get('SAFESCARF_TEST_SERVICE', "")
     SAFESCARF_VERSION = args.version if args.version else GITLAB_VERSION_REF
     SAFESCARF_NAME = args.name if args.name else os.environ.get('SAFESCARF_NAME', "")
+    SAFESCARF_REIMPORT_DO_NOT_REACTIVATE = args.do_not_reactivate if args.do_not_reactivate else os.environ.get('SAFESCARF_REIMPORT_DO_NOT_REACTIVATE', False)
+    SAFESACRF_BRANCH_TAG = args.branch_tag if args.branch_tag else os.environ.get('SAFESACRF_BRANCH_TAG', "")
+    SAFESACRF_COMMIT_HASH = args.commit_hash if args.commit_hash else os.environ.get('SAFESACRF_COMMIT_HASH', "")
+    SAFESCARF_BUILD_ID = args.build_id if args.build_id else os.environ.get('SAFESCARF_BUILD_ID', "")
+    SAFESCARF_REIMPORT = args.reimport if args.reimport else os.environ.get('SAFESCARF_REIMPORT', True)
 
     # verify that given engagement id is accessible
     if SAFESCARF_ENGAGEMENT_ID != "" and int(SAFESCARF_ENGAGEMENT_ID) > 0:
