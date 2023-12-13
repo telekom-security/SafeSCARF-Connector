@@ -8,7 +8,7 @@ import glob
 from datetime import datetime, timedelta  # Import the datetime module
 
 # Set default values for environment variables
-SAFESCARF_ENGAGEMENT_PERIOD = os.environ.get("SAFESCARF_ENGAGEMENT_THREAT_MODEL", 7)
+SAFESCARF_ENGAGEMENT_PERIOD = os.environ.get("SAFESCARF_ENGAGEMENT_PERIOD", 7)
 TODAY = os.environ.get("TODAY", (datetime.now()).strftime("%Y-%m-%d"))
 ENDDAY = os.environ.get("ENDDAY", (datetime.now() + timedelta(days=SAFESCARF_ENGAGEMENT_PERIOD)).strftime("%Y-%m-%d"))
 CI_COMMIT_DESCRIPTION = os.environ.get("CI_COMMIT_DESCRIPTION", "Commit description")
