@@ -336,7 +336,6 @@ def upload(files):
                     "scan_type": SAFESCARF_SCAN_TYPE,
                     "engagement": SAFESCARF_ENGAGEMENT_ID,
                     "close_old_findings": SAFESCARF_SCAN_CLOSE_OLD_FINDINGS,
-                    "push_to_jira": SAFESCARF_SCAN_PUSH_TO_JIRA,
                     "environment": SAFESCARF_SCAN_ENVIRONMENT,
                     "service": SAFESCARF_TEST_SERVICE,
                     "version": SAFESCARF_VERSION,
