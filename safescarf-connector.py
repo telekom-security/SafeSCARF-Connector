@@ -315,11 +315,12 @@ def upload(files):
 
     reimport = SAFESCARF_REIMPORT
 
-    # Check if a test with the same title exists in the engagement
-    if SAFESCARF_ENGAGEMENT_ID and SAFESCARF_NAME and check_test_exists(SAFESCARF_ENGAGEMENT_ID, SAFESCARF_NAME):
-        reimport = True
+    # Check if reimport is possible
+    # test whether the same test title exists in the engagement
+    if reimport and SAFESCARF_ENGAGEMENT_ID and SAFESCARF_NAME and check_test_exists(SAFESCARF_ENGAGEMENT_ID, SAFESCARF_NAME):
+        reimport = True # set reimport true if possible
     else:
-        reimport = False
+        reimport = False # default to False if impossible or not desired
 
     for file_pattern in files:
         matching_files = glob.glob(file_pattern)
