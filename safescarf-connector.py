@@ -5,6 +5,7 @@ import os
 import json
 import requests
 import glob
+from urllib.parse import quote
 from datetime import datetime, timedelta  # Import the datetime module
 
 # Set default values for environment variables
@@ -160,7 +161,7 @@ def check_test_exists(engagement_id, test_title):
     headers = {
         "Authorization": f"Token {SAFESCARF_API_TOKEN}",
     }
-
+    test_title = quote(test_title)
     response = requests.get(f"{SAFESCARF_URL}/api/v2/tests/?engagement={engagement_id}&title={test_title}", headers=headers)
 
     if response.status_code == 200:
