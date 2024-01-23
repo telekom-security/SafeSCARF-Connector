@@ -161,7 +161,7 @@ def check_test_exists(engagement_id, test_title):
         "Authorization": f"Token {SAFESCARF_API_TOKEN}",
     }
 
-    response = requests.get(f"{SAFESCARF_URL}/api/v2/engagements/{engagement_id}/tests/?test__title={test_title}", headers=headers)
+    response = requests.get(f"{SAFESCARF_URL}/api/v2/tests/?engagement={engagement_id}&title={test_title}", headers=headers)
 
     if response.status_code == 200:
         tests = response.json().get("results", [])
