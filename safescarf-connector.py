@@ -183,8 +183,7 @@ def create_engagement():
         return
 
     # Add tags to the tags array using a list comprehension
-    tags = ["GITLAB-CI"]
-    tags.extend(TAGS)
+    tags = TAGS
 
     # default engagement name to pipeline id
     if SAFESCARF_NAME == "":
@@ -311,8 +310,7 @@ def upload(files):
         return
 
     # Add tags to the tags array using a list comprehension
-    tags = ["GITLAB-CI"]
-    tags.extend(TAGS)
+    tags = TAGS
 
     reimport = SAFESCARF_REIMPORT
 
