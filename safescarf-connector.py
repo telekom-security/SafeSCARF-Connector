@@ -191,7 +191,7 @@ def create_engagement():
 
     if SAFESCARF_WORKFLOW:
         tags.append("flow:" + SAFESCARF_WORKFLOW)
-        if SAFESCARF_WORKFLOW == "branch":
+        if SAFESCARF_WORKFLOW == "feature":
             SAFESCARF_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT = True
             SAFESCARF_NAME = GITLAB_VERSION_REF # Tag and Branch Pipelines only (no Merge Pipeline)
             # Check if an engagement with the same name exists
@@ -383,7 +383,7 @@ parser = argparse.ArgumentParser(description="API Connector for easier integrati
 parser.add_argument("command", choices=["create-engagement", "upload", "help", "scan-types"], help="Specify the command")
 
 # Add an argument for --workflow
-parser.add_argument("--workflow", choices=["branch", "pipeline"], help="Specify the workflow type for create-engagement")
+parser.add_argument("--workflow", choices=["feature", "pipeline"], help="Specify the workflow type for create-engagement")
 
 # Add an argument for --api-key
 parser.add_argument("--api-key", help="Specify the API key as a string")
