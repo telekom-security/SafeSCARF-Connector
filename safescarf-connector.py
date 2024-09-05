@@ -191,7 +191,7 @@ def create_engagement():
 
     if SAFESCARF_WORKFLOW:
         tags.append("flow:" + SAFESCARF_WORKFLOW)
-        if SAFESCARF_WORKFLOW == "feature":
+        if SAFESCARF_WORKFLOW == "branch":
             SAFESCARF_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT = True
             SAFESCARF_NAME = GITLAB_VERSION_REF # Tag and Branch Pipelines only (no Merge Pipeline)
             # Check if an engagement with the same name exists
