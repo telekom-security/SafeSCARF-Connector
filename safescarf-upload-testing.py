@@ -4,12 +4,44 @@ from datetime import datetime, timedelta
 import json
 import sys
 from typing import Optional
+import re
+import validators
+
+
+def validate_input(args):
+    if len(args) != 6:
+        raise ValueError(f"Invalid number of arguments. Expected 6 arguments: <Token> <Engagement ID> <Scan Title> <Minutes Delay> <URL>, but provided {len(args)} arguments")
+
+    token = args[1]
+    if not re.match(r"^[a-f0-9]{40}$", token):
+        raise ValueError(f"Invalid token format: {token}. Expected a 40-character hexadecimal string.")
+
+    engagement_id = args[2]
+    if not engagement_id.isdigit():
+        raise ValueError(f"Invalid engagement ID: {engagement_id}. Expected a numeric value.")
+
+    scan_title = args[3]
+    if len(scan_title.strip()) == 0:
+        raise ValueError("Invalid scan title: Title cannot be empty.")
+
+    try:
+        minutes_delay = int(args[4])
+        if minutes_delay <= 0:
+            raise ValueError(f"Invalid minutes delay: {minutes_delay}. It must be a positive integer.")
+    except ValueError:
+        raise ValueError(f"Invalid minutes delay: {args[4]}. It must be an integer.")
+
+    # Validate the URL (Argument 5)
+    url = args[5]
+    if not validators.url(url):
+        raise ValueError(f"Invalid URL: {url}.")
+
+    print("All inputs are valid!")
+    return True
 
 
 def main():
-    if len(sys.argv) != 6:
-        raise ValueError("Invalid number of arguments, expected 4 arguments with the following order: Safe Scarf API token, Engagement Id, Test title,  delay in minutes, Safe Scarf url")
-
+    validate_input(sys.argv)
     password = sys.argv[1]
     engagement_id = sys.argv[2]
     title = sys.argv[3]
