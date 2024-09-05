@@ -27,22 +27,18 @@ build_image:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-#  rules:
-#    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true"'
   script:
-#    - mkdir -p /kaniko/.docker
-#    - echo "{\"auths\":{\"${MTR_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${MTR_REGISTRY_USER}" "${MTR_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-    - echo "{\"auths\":{\"${MTR_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${MTR_REGISTRY_USER}" "${MTR_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > ./config.json
-  #    - /kaniko/executor
-#        --context "${CI_PROJECT_DIR}"
-#        --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-#        --destination "${MTR_REGISTRY_IMAGE}:0.1.0"
-#        --build-arg http_proxy="http://proxy.devops.telekom.de:3128"
-#        --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
-#        --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
-  artifacts:
-    paths:
-      - ./config.json
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"${MTR_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${MTR_REGISTRY_USER}" "${MTR_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+      - /kaniko/executor
+        --context "${CI_PROJECT_DIR}"
+        --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+        --destination "${MTR_REGISTRY_IMAGE}:0.1.0"
+        --build-arg http_proxy="http://proxy.devops.telekom.de:3128"
+        --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
+        --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
 
 #scan-docker-image-trivy:
 #  stage: test
