@@ -41,4 +41,5 @@ COPY safescarf-upload-testing.py /app/safescarf-upload-testing.py
 WORKDIR /app
 
 # Run your script when the container launches
-CMD ["python", "safescarf-connector.py", "safescarf-upload-testing.py"]
+CMD ["python", "safescarf-connector.py"]
+#CMD ["python", "safescarf-upload-testing.py"]
