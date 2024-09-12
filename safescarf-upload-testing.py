@@ -44,7 +44,7 @@ def validate_input(args):
 def main():
     if SAFESCARF_TESTING_MODE_ENABLE == "false":
         print("SafeScarf Testing Mode is disabled. Exiting...")
-        exit 0
+        quit()
     validate_input(sys.argv)
     password = sys.argv[1]
     engagement_id = sys.argv[2]
