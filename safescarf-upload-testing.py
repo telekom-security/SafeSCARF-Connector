@@ -7,6 +7,7 @@ from typing import Optional
 import re
 import validators
 
+SAFESCARF_TESTING_MODE_ENABLE = os.environ.get("SAFESCARF_TESTING_MODE_ENABLE", "false")
 
 def validate_input(args):
     if len(args) != 6:
@@ -41,6 +42,9 @@ def validate_input(args):
 
 
 def main():
+    if SAFESCARF_TESTING_MODE_ENABLE == "false":
+        print("SafeScarf Testing Mode is disabled. Exiting...")
+        exit 0
     validate_input(sys.argv)
     password = sys.argv[1]
     engagement_id = sys.argv[2]
