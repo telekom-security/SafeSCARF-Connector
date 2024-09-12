@@ -10,7 +10,7 @@ import validators
 
 def validate_input(args):
     if len(args) != 6:
-        raise ValueError(f"Invalid number of arguments. Expected 6 arguments: <Token> <Engagement ID> <Scan Title> <Minutes Delay> <URL>, but provided {len(args)} arguments")
+        raise ValueError(f"Invalid number of arguments. Expected 5 arguments: <Token> <Engagement ID> <Scan Title> <Minutes Delay> <URL>, but provided {len(args)-1} arguments")
 
     token = args[1]
     if not re.match(r"^[a-f0-9]{40}$", token):

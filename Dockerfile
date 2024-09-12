@@ -42,4 +42,3 @@ WORKDIR /app
 
 # Run your script when the container launches
 CMD ["python", "safescarf-connector.py"]
-#CMD ["python", "safescarf-upload-testing.py"]
