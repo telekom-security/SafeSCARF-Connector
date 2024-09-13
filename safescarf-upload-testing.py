@@ -83,7 +83,7 @@ def find_expected_test(tests, title, minutes_delay) -> Optional[dict]:
     now = datetime.now()
     earlier = datetime.now() - timedelta(minutes=minutes_delay)
     for test in tests:
-        if test.get("test_type_name") == title and now > datetime.strptime(test.get("updated"), "%Y-%m-%dT%H:%M:%S.%fZ") > earlier:
+        if test.get("title") == title and now > datetime.strptime(test.get("updated"), "%Y-%m-%dT%H:%M:%S.%fZ") > earlier:
             print(test)
             return test
     return None
