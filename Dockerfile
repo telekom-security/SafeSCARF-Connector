@@ -33,8 +33,9 @@ ENV SAFESCARF_ENGAGEMENT_PERIOD=7 \
 COPY requirements.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
 
-# Copy your Python script into the container
+# Copy your Python scripts into the container
 COPY safescarf-connector.py /app/safescarf-connector.py
+COPY safescarf-upload-testing.py /app/safescarf-upload-testing.py
 
 # Set the working directory to /app
 WORKDIR /app
