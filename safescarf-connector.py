@@ -12,6 +12,7 @@ from datetime import datetime, timedelta  # Import the datetime module
 SAFESCARF_ENGAGEMENT_PERIOD = int(os.environ.get("SAFESCARF_ENGAGEMENT_PERIOD", 7))
 TODAY = os.environ.get("TODAY", (datetime.now()).strftime("%Y-%m-%d"))
 ENDDAY = os.environ.get("ENDDAY", (datetime.now() + timedelta(days=SAFESCARF_ENGAGEMENT_PERIOD)).strftime("%Y-%m-%d"))
+CI = os.environ.get("CI", False)
 CI_COMMIT_DESCRIPTION = os.environ.get("CI_COMMIT_DESCRIPTION", "Commit description")
 CI_COMMIT_SHORT_SHA = os.environ.get("CI_COMMIT_SHORT_SHA", "")
 GITLAB_VERSION_REF = os.environ["CI_MERGE_REQUEST_ID"] if "CI_MERGE_REQUEST_ID" in os.environ \
@@ -192,7 +193,9 @@ def create_engagement():
         tags.append("flow:" + SAFESCARF_WORKFLOW)
         if SAFESCARF_WORKFLOW == "feature":
             SAFESCARF_ENGAGEMENT_DEDUPLICATION_ON_ENGAGEMENT = True
-            SAFESCARF_NAME = GITLAB_VERSION_REF # Tag and Branch Pipelines only (no Merge Pipeline)
+            # Keep passed engagement name if not in GitLab Pipeline
+            if CI:
+                SAFESCARF_NAME = GITLAB_VERSION_REF # Tag and Branch Pipelines only (no Merge Pipeline)
             # Check if an engagement with the same name exists
             engagement_id = check_engagement_exists(SAFESCARF_NAME)
             if engagement_id:
