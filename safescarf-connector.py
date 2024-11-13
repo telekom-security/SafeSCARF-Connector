@@ -108,7 +108,6 @@ def check_engagement_access(engagement_id):
         "Authorization": f"Token {SAFESCARF_API_TOKEN}",
     }
 
-    print(SAFESCARF_API_TOKEN)
     # Make an API request to check access to the engagement
     response = requests.get(f"{SAFESCARF_URL}/api/v2/engagements/{engagement_id}/", headers=headers)
 
