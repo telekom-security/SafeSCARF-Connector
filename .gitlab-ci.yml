@@ -4,6 +4,10 @@ stages:
   - test
   - publish
 
+default:
+  tags:
+    - aws_run_k8s_intel
+
 variables:
   MTR_REGISTRY: mtr.devops.telekom.de
   MTR_REGISTRY_IMAGE: mtr.devops.telekom.de/secureops/safescarf-connector
@@ -36,9 +40,6 @@ build_image:
         --context "${CI_PROJECT_DIR}"
         --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
         --destination "${MTR_REGISTRY_IMAGE}:$CI_COMMIT_SHORT_SHA"
-        --build-arg http_proxy="http://proxy.devops.telekom.de:3128"
-        --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
-        --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
 
 #scan-docker-image-trivy:
 #  stage: test
@@ -67,6 +68,3 @@ publish_release:
         --context "${CI_PROJECT_DIR}"
         --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
         --destination "${MTR_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
-        --build-arg http_proxy="http://proxy.devops.telekom.de:3128"
-        --build-arg https_proxy="http://proxy.devops.telekom.de:3128"
-        --build-arg no_proxy="localhost,127.0.0.1,.workbench.telekom.de,.devops.telekom.de"
